@@ -1,0 +1,42 @@
+Followed bottom-up approach [Model Design Development  to API + UI]
+
+1. Setup coding policies
+
+2. Prompt — Create Supplier Schema
+	Create a supplier data model for evaluating suppliers based on capability, region, cost, and performance rating.
+
+3. Prompt — Build Fit Logic
+	Create a supplier fit scoring logic using:
+	Capability match (40%)
+	Cost alignment (30%)
+	Region match (20%)
+	Performance rating (10%)
+	
+4. Prompt - Cost Alignment Logic
+	Add logic to evaluate cost alignment:
+	If supplier cost ≤ target cost → High alignment
+	If within 10% → Medium
+	Else → Low
+	
+5. Prompt — Risk Logic
+	Add a basic supplier risk indicator based on:
+	Performance rating
+	Region concentration
+	
+6. Prompt — Build Recommendation Engine
+	Create logic that ranks suppliers based on fit score and outputs:
+	Supplier Name
+	Fit Score
+	Risk Level
+	Cost Alignment
+	
+7. Prompt  — API Layer
+	Create a simple API endpoint that accepts:
+	Component type
+	Volume
+	Region
+	Target cost
+	And returns ranked suppliers
+	
+8. Prompt — UI Table
+	Generate a simple UI table layout to display ranked supplier recommendations.
