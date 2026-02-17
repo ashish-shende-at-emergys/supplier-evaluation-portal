@@ -13,6 +13,27 @@ A Python-based tool for evaluating and ranking suppliers based on configurable c
     - Detailed breakdown of supplier capabilities, pricing, and history via modal.
 - **API**: RESTful API powered by FastAPI.
 
+## Evaluation Logic
+
+The system ranks suppliers by calculating a **Fit Score** (0-100) based on four weighted criteria:
+
+1.  **Capability Match (40%)**: Does the supplier offer the specific service you need?
+    -   *Example*: If you require "CNC Machining" and the supplier lists it, they receive a 100% capability score. If not, 0%.
+2.  **Cost Alignment (30%)**: Is their price within your target range?
+    -   *High Match*: Price <= Target (e.g., Target $10, Supplier $9 → 100% score)
+    -   *Medium Match*: Price within 10% of Target (e.g., Target $10, Supplier $10.50 → 50% score)
+    -   *Low/No Match*: Price > Target + 10% (e.g., Target $10, Supplier $12 → 0% score)
+3.  **Region Match (20%)**: Are they located in your target country/state?
+    -   *Example*: If you target "USA" and the supplier has operations in "USA", they get a 100% region score.
+4.  **Performance History (10%)**: Based on their average quality, timeliness, and communication scores.
+    -   *Example*: A supplier with an overall rating of 9.0/10 contributes 9 points to the final weighted score.
+
+### Risk Assessment
+
+Risk is automatically categorized as **Low**, **Medium**, or **High** based on the worst of two factors:
+-   **Performance Risk**: Derived from their historical performance scores.
+-   **Geographic Risk**: Based on how many countries they operate in (more countries = lower risk).
+
 ## Tech Stack
 
 - **Backend**: Python 3.9+, FastAPI, Pydantic
