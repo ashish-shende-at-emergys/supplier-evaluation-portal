@@ -1,0 +1,278 @@
+{
+  "$defs": {
+    "Capability": {
+      "properties": {
+        "category": {
+          "description": "Category of capability, e.g., Manufacturing, Logistics",
+          "title": "Category",
+          "type": "string"
+        },
+        "services": {
+          "description": "List of specific services offered",
+          "items": {
+            "type": "string"
+          },
+          "title": "Services",
+          "type": "array"
+        },
+        "certifications": {
+          "description": "List of certifications, e.g., ISO 9001",
+          "items": {
+            "type": "string"
+          },
+          "title": "Certifications",
+          "type": "array"
+        }
+      },
+      "required": [
+        "category"
+      ],
+      "title": "Capability",
+      "type": "object"
+    },
+    "ContactInfo": {
+      "properties": {
+        "email": {
+          "description": "Contact email address",
+          "format": "email",
+          "title": "Email",
+          "type": "string"
+        },
+        "phone": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Contact phone number",
+          "title": "Phone"
+        },
+        "address": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Physical address",
+          "title": "Address"
+        }
+      },
+      "required": [
+        "email"
+      ],
+      "title": "ContactInfo",
+      "type": "object"
+    },
+    "CostModel": {
+      "properties": {
+        "item_name": {
+          "description": "Name of the item or service",
+          "title": "Item Name",
+          "type": "string"
+        },
+        "unit_cost": {
+          "description": "Cost per unit",
+          "exclusiveMinimum": 0,
+          "title": "Unit Cost",
+          "type": "number"
+        },
+        "currency": {
+          "description": "Currency code, e.g., USD",
+          "maxLength": 3,
+          "minLength": 3,
+          "title": "Currency",
+          "type": "string"
+        },
+        "bulk_discount_available": {
+          "default": false,
+          "description": "Whether bulk discounts are available",
+          "title": "Bulk Discount Available",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "item_name",
+        "unit_cost",
+        "currency"
+      ],
+      "title": "CostModel",
+      "type": "object"
+    },
+    "PerformanceRating": {
+      "properties": {
+        "period_start": {
+          "description": "Start date of the rating period",
+          "format": "date",
+          "title": "Period Start",
+          "type": "string"
+        },
+        "period_end": {
+          "description": "End date of the rating period",
+          "format": "date",
+          "title": "Period End",
+          "type": "string"
+        },
+        "quality_score": {
+          "description": "Quality score (0-10)",
+          "maximum": 10,
+          "minimum": 0,
+          "title": "Quality Score",
+          "type": "number"
+        },
+        "timeliness_score": {
+          "description": "Timeliness score (0-10)",
+          "maximum": 10,
+          "minimum": 0,
+          "title": "Timeliness Score",
+          "type": "number"
+        },
+        "communication_score": {
+          "description": "Communication score (0-10)",
+          "maximum": 10,
+          "minimum": 0,
+          "title": "Communication Score",
+          "type": "number"
+        },
+        "reviewer_comments": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional comments from the reviewer",
+          "title": "Reviewer Comments"
+        }
+      },
+      "required": [
+        "period_start",
+        "period_end",
+        "quality_score",
+        "timeliness_score",
+        "communication_score"
+      ],
+      "title": "PerformanceRating",
+      "type": "object"
+    },
+    "Region": {
+      "properties": {
+        "country": {
+          "description": "Country of operation",
+          "title": "Country",
+          "type": "string"
+        },
+        "state_province": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "State or province, if applicable",
+          "title": "State Province"
+        },
+        "service_radius_km": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Service radius in kilometers",
+          "title": "Service Radius Km"
+        }
+      },
+      "required": [
+        "country"
+      ],
+      "title": "Region",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "id": {
+      "description": "Unique identifier for the supplier",
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "name": {
+      "description": "Name of the supplier",
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "contact_info": {
+      "$ref": "#/$defs/ContactInfo",
+      "description": "Contact information for the supplier"
+    },
+    "capabilities": {
+      "description": "List of supplier capabilities",
+      "items": {
+        "$ref": "#/$defs/Capability"
+      },
+      "title": "Capabilities",
+      "type": "array"
+    },
+    "regions": {
+      "description": "Regions where the supplier operates",
+      "items": {
+        "$ref": "#/$defs/Region"
+      },
+      "title": "Regions",
+      "type": "array"
+    },
+    "pricing": {
+      "description": "Pricing models for items/services",
+      "items": {
+        "$ref": "#/$defs/CostModel"
+      },
+      "title": "Pricing",
+      "type": "array"
+    },
+    "ratings": {
+      "description": "Performance ratings over time",
+      "items": {
+        "$ref": "#/$defs/PerformanceRating"
+      },
+      "title": "Ratings",
+      "type": "array"
+    },
+    "overall_score": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Calculated overall score",
+      "title": "Overall Score"
+    }
+  },
+  "required": [
+    "name",
+    "contact_info"
+  ],
+  "title": "Supplier",
+  "type": "object"
+}

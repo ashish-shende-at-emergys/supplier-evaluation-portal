@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supplier Evaluation</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-color: #3b82f6;
+            --accent-hover: #2563eb;
+            --border-color: #334155;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Glassmorphism Card */
+        .card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 2rem;
+        }
+
+        /* Form Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        input,
+        select {
+            background-color: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background-color: rgba(15, 23, 42, 0.5);
+            padding: 1rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Status Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .risk-low {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+        }
+
+        .risk-medium {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+        }
+
+        .risk-high {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .score {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        #results-area {
+            display: none;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: inherit;
+            z-index: 10;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            line-height: 1;
+            width: auto;
+        }
+
+        .close-btn:hover {
+            color: var(--text-primary);
+            background: none;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .detail-section {
+            margin-bottom: 2rem;
+        }
+
+        .detail-section h3 {
+            color: var(--accent-color);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .detail-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .detail-value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        tr {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header class="animate-fade-in">
+            <h1>Supplier Evaluation</h1>
+            <p class="subtitle">AI-Powered Supplier Ranking & Risk Assessment</p>
+        </header>
+
+        <div class="card animate-fade-in" style="animation-delay: 0.1s;">
+            <form id="evaluation-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="component_type">Component Type</label>
+                        <select id="component_type" required>
+                            <option value="Widget">Widget</option>
+                            <option value="Gadget">Gadget</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="volume">Volume</label>
+                        <input type="number" id="volume" value="1000" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="region_country">Target Region</label>
+                        <select id="region_country" required>
+                            <option value="China">China</option>
+                            <option value="USA">USA</option>
+                            <option value="Mexico">Mexico</option>
+                            <option value="Vietnam">Vietnam</option>
+                            <option value="India">India</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="target_cost">Target Cost (USD)</label>
+                        <input type="number" id="target_cost" value="5.0" step="0.1" min="0" required>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button type="submit" style="flex: 2;">Rank Suppliers</button>
+                    <button type="button" id="view-all-btn"
+                        style="display: none; flex: 1; background-color: transparent; border: 1px solid var(--accent-color);">View
+                        All</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="results-area" class="card animate-fade-in" style="animation-delay: 0.2s;">
+            <h2 style="margin-top: 0; margin-bottom: 1.5rem;">Ranked Recommendations</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Supplier Name</th>
+                            <th>Fit Score</th>
+                            <th>Risk Level</th>
+                            <th>Cost Alignment</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-body">
+                        <!-- Results will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="supplier-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Supplier Details</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('evaluation-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = e.target.querySelector('button');
+            const originalText = submitBtn.innerText;
+            submitBtn.innerText = 'Analyzing...';
+            submitBtn.disabled = true;
+
+            const criteria = {
+                component_type: document.getElementById('component_type').value,
+                volume: parseInt(document.getElementById('volume').value),
+                region_country: document.getElementById('region_country').value,
+                region_state: null,
+                target_cost: parseFloat(document.getElementById('target_cost').value),
+                currency: "USD"
+            };
+
+            try {
+                const response = await fetch('/rank', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(criteria)
+                });
+
+                if (!response.ok) {
+                    throw new Error('API request failed');
+                }
+
+                const data = await response.json();
+                renderResults(data);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to fetch rankings. Ensure the backend is running.');
+            } finally {
+                submitBtn.innerText = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        document.getElementById('view-all-btn').addEventListener('click', async () => {
+            const btn = document.getElementById('view-all-btn');
+            const originalText = btn.innerText;
+            btn.innerText = 'Loading...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/suppliers');
+                if (!response.ok) throw new Error('Failed to fetch suppliers');
+                const data = await response.json();
+                renderResults(data);
+            } catch (error) {
+                console.error(error);
+                alert('Failed to load suppliers.');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        function renderResults(suppliers) {
+            const tbody = document.getElementById('results-body');
+            tbody.innerHTML = '';
+
+            suppliers.forEach((supplier, index) => {
+                const tr = document.createElement('tr');
+                tr.style.animation = `fadeIn 0.3s ease-out forwards ${index * 0.1}s`;
+                tr.style.opacity = '0'; // Initial state for animation
+                tr.onclick = () => openModal(supplier);
+
+                // Risk Badge Helper
+                const getRiskBadge = (level) => {
+                    const cls = level === 'Low' ? 'risk-low' : level === 'Medium' ? 'risk-medium' : 'risk-high';
+                    return `<span class="badge ${cls}">${level}</span>`;
+                };
+
+                tr.innerHTML = `
+                    <td>#${index + 1}</td>
+                    <td style="font-weight: 500;">${supplier.supplier_name}</td>
+                    <td class="score" style="color: ${supplier.fit_score > 0 ? (supplier.fit_score >= 80 ? 'var(--success-color)' : 'var(--text-primary)') : 'var(--text-secondary)'}">
+                        ${supplier.fit_score > 0 ? supplier.fit_score.toFixed(1) + '%' : 'N/A'}
+                    </td>
+                    <td>${getRiskBadge(supplier.risk_level)}</td>
+                    <td>${supplier.cost_alignment}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const resultsArea = document.getElementById('results-area');
+            resultsArea.style.display = 'block';
+            resultsArea.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function openModal(supplier) {
+            const modal = document.getElementById('supplier-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+            const details = supplier.details;
+
+            console.log("Opening modal for:", details);
+
+            title.textContent = details.name;
+
+            // Helper for simple fields
+            const item = (label, value) => `
+                <div class="detail-item">
+                    <span class="detail-label">${label}</span>
+                    <span class="detail-value">${value || '-'}</span>
+                </div>
+            `;
+
+            body.innerHTML = `
+                <div class="detail-section">
+                    <h3>Contact Information</h3>
+                    <div class="detail-grid">
+                        ${item('Email', details.contact_info.email)}
+                        ${item('Phone', details.contact_info.phone)}
+                        ${item('Address', details.contact_info.address)}
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>Capabilities</h3>
+                    ${details.capabilities.map(cap => `
+                        <div style="margin-bottom: 1rem;">
+                            <strong>${cap.category}</strong>: ${cap.services.join(', ')}
+                            <br>
+                            <small style="color: var(--text-secondary)">Certifications: ${cap.certifications.join(', ') || 'None'}</small>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="detail-section">
+                    <h3>Regions</h3>
+                    <div class="detail-grid">
+                        ${details.regions.map(r => item(r.country, r.state_province)).join('')}
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>Pricing Models</h3>
+                    ${details.pricing.map(p => `
+                        <div class="detail-grid" style="margin-bottom: 0.5rem; border-left: 2px solid var(--border-color); padding-left: 0.5rem;">
+                            ${item('Item', p.item_name)}
+                            ${item('Cost', `${p.currency} ${p.unit_cost}`)}
+                            ${item('Bulk Discount', p.bulk_discount_available ? 'Yes' : 'No')}
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="detail-section">
+                    <h3>Performance History</h3>
+                    <div style="font-size: 0.9rem;">
+                        ${details.ratings.map(r => `
+                            <div style="margin-bottom: 0.5rem; padding: 0.75rem; background: rgba(255,255,255,0.03); border-radius: 0.5rem;">
+                                <div style="margin-bottom: 0.25rem; font-weight: 500;">Period: ${r.period_start} to ${r.period_end}</div>
+                                <div style="display: flex; gap: 1rem; flex-wrap: wrap; color: var(--text-secondary);">
+                                    <span>Quality: <span style="color: var(--text-primary)">${r.quality_score}</span></span>
+                                    <span>Timeliness: <span style="color: var(--text-primary)">${r.timeliness_score}</span></span>
+                                    <span>Comm: <span style="color: var(--text-primary)">${r.communication_score}</span></span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('supplier-modal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Close on outside click
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('supplier-modal');
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Close on Esc
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+
+</html>
